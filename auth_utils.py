@@ -14,15 +14,16 @@ def save_users(users):
 
 def add_user(username, email, password):
     users = load_users()
-    if username in users:
+    if email in users:
         return False  # Usuario ya existe
 
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    users[username] = {
+    users[email] = {
         'email': email,
         'password': hashed_password.decode('utf-8')
     }
-    save_users(users)
+    with open('users.json', 'w') as f:
+        json.dump(users, f, indent=4, ensure_ascii=False)
     return True
 
 def validate_user(username, password):
