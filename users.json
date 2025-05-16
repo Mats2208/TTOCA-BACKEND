@@ -1,1 +1,17 @@
-{}
+{
+    "mateoandres2208@gmail.com": {
+        "email": "mateoandres2208@gmail.com",
+        "password": "$2b$12$RDsfAMUCwIH.X87dRDTzSeAI3mEld5iBjsnHn0vjNJPgyZz4rUH9K",
+        "empresas": [
+            {
+                "id": "1700b37d",
+                "nombre": "TEST",
+                "logo": "https://img.remediosdigitales.com/96633b/140013_cor/450_1000.jpg",
+                "titular": "MATEO SOTO",
+                "config": {
+                    "horario": "LUN - VIERNES"
+                }
+            }
+        ]
+    }
+}
