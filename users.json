@@ -13,5 +13,20 @@
                 }
             }
         ]
+    },
+    "test@gmail.com": {
+        "email": "test@gmail.com",
+        "password": "$2b$12$esTb8VqQo0.MipU8m1KHEu2wj3L7RUTNMQT99JTyZtMK6c7CNMwg.",
+        "empresas": [
+            {
+                "id": "d03d8201",
+                "nombre": "PRUEBA",
+                "logo": "https://www.dolarbluebolivia.click/Logo.png",
+                "titular": "MATEO SOTO",
+                "config": {
+                    "horario": "lun - vie"
+                }
+            }
+        ]
     }
 }
