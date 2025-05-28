@@ -1,0 +1,27 @@
+{
+    "d9e76035": {
+        "categorias": [
+            {
+                "descripcion": "COMIDA",
+                "id": "f26456df-b8fa-4fbb-a4d3-cac3f46c80f0",
+                "nombre": "RESTAURANTE",
+                "prioridad": false,
+                "tiempoEstimado": 5
+            },
+            {
+                "descripcion": "COMIDA",
+                "id": "01a79d0c-5cb2-40d1-995b-399b87dc349c",
+                "nombre": "PEDIDOS YA",
+                "prioridad": false,
+                "tiempoEstimado": 5
+            },
+            {
+                "id": "87db77f6-67b2-4d10-ae17-293309a94a93",
+                "nombre": "asfas",
+                "descripcion": "asdfas",
+                "prioridad": false,
+                "tiempoEstimado": 5
+            }
+        ]
+    }
+}

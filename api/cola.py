@@ -52,4 +52,28 @@ def api_turno_actual(id_empresa, id_cola):
         return jsonify(turno)
     return jsonify(None)
 
+@cola_bp.route('/proyectos/<id_empresa>/cola/<id_cola>/verificar', methods=['GET'])
+def api_verificar_turno(id_empresa, id_cola):
+    from Cola_utils import obtener_posicion_turno
 
+    identificador = request.args.get("id") or request.args.get("nombre")
+    if not identificador:
+        return jsonify({"error": "Se requiere 'id' o 'nombre'"}), 400
+
+    resultado = obtener_posicion_turno(id_empresa, id_cola, identificador)
+    if resultado:
+        return jsonify(resultado)
+    return jsonify({"mensaje": "Turno no encontrado"}), 404
+
+
+@cola_bp.route('/verificar-global', methods=['GET'])
+def verificar_global():
+    from Cola_utils import buscar_turno_global
+    codigo = request.args.get("codigo")
+    if not codigo:
+        return jsonify({"error": "Falta el parámetro 'codigo'"}), 400
+
+    resultado = buscar_turno_global(codigo)
+    if resultado:
+        return jsonify(resultado)
+    return jsonify({"mensaje": "Turno no encontrado"}), 404

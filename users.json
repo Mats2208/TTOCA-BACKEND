@@ -1,31 +1,20 @@
 {
     "mateoandres2208@gmail.com": {
         "email": "mateoandres2208@gmail.com",
-        "password": "$2b$12$RDsfAMUCwIH.X87dRDTzSeAI3mEld5iBjsnHn0vjNJPgyZz4rUH9K",
+        "password": "$2b$12$x20p5sBpyZfSFj.rk9StPeCbPfAnDhv5p04D/3LLbpr1codxsVf1W",
         "empresas": [
             {
-                "id": "1700b37d",
-                "nombre": "TEST",
-                "logo": "https://img.remediosdigitales.com/96633b/140013_cor/450_1000.jpg",
+                "id": "d9e76035",
+                "nombre": "TTOCA",
+                "logo": "",
                 "titular": "MATEO SOTO",
                 "config": {
-                    "horario": "LUN - VIERNES"
-                }
-            }
-        ]
-    },
-    "test@gmail.com": {
-        "email": "test@gmail.com",
-        "password": "$2b$12$esTb8VqQo0.MipU8m1KHEu2wj3L7RUTNMQT99JTyZtMK6c7CNMwg.",
-        "empresas": [
-            {
-                "id": "d03d8201",
-                "nombre": "PRUEBA",
-                "logo": "https://www.dolarbluebolivia.click/Logo.png",
-                "titular": "MATEO SOTO",
-                "config": {
-                    "horario": "lun - vie"
-                }
+                    "horario": "LUN - VIE"
+                },
+                "direccion": "URB Bosques de la Colina",
+                "telefono": "62242159",
+                "email": "mateoandres2208@gmail.com",
+                "horario": "LUN - VIE"
             }
         ]
     }
