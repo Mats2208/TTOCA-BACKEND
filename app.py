@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request, abort
 from flask_cors import CORS
 from api.auth import auth_bp
 from api.empresa import empresa_bp
@@ -8,46 +8,69 @@ from database import init_database
 import os
 import atexit
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "http://localhost:5173", "https://www.ttoca.online"]}})
+# --- Config estática manual ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DIST_DIR = os.path.join(BASE_DIR, "dist")
 
-# Inicializar base de datos al iniciar la aplicación
+# Desactiva la ruta estática automática (evita interceptar /pricing, /login, etc.)
+app = Flask(__name__, static_folder=None)
+
+# CORS solo para API
+CORS(
+    app,
+    resources={r"/api/*": {"origins": [
+        "http://localhost:5173",
+        "https://ttoca.online",
+        "https://www.ttoca.online",
+    ]}},
+    supports_credentials=True
+)
+
+# Inicializa DB
 init_database()
 
-# Registrar el blueprint de autenticación
+# Blueprints API
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
-
-#registro para commitear empresas desde /home
 app.register_blueprint(empresa_bp, url_prefix='/api')
-
-#Registro para commitear turnos desde /Dashboard
 app.register_blueprint(cola_bp, url_prefix='/api')
-
-#Registro para commitear configuraciones de las distintas queue que puede crear el usuario
 app.register_blueprint(cola_config_bp, url_prefix='/api')
 
-# Función de limpieza que se ejecuta periódicamente
+# Limpieza al salir
 def cleanup_old_records():
     try:
         from db_cola_utils import limpiar_turnos_antiguos
-        turnos_eliminados = limpiar_turnos_antiguos()
-        if turnos_eliminados > 0:
-            print(f"🧹 Limpieza automática: {turnos_eliminados} turnos antiguos eliminados")
+        n = limpiar_turnos_antiguos()
+        if n > 0:
+            print(f"🧹 Limpieza automática: {n} turnos antiguos eliminados")
     except Exception as e:
         print(f"Error en limpieza automática: {e}")
 
-# Registrar función de limpieza para cuando se cierre la aplicación
 atexit.register(cleanup_old_records)
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve_spa(path):
-    if path != "" and os.path.exists(os.path.join('dist', path)):
-        return send_from_directory('dist', path)
-    else:
-        return send_from_directory('dist', 'index.html')
+# --- Servir SPA ---
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def spa(path):
+    # No interceptar rutas de API
+    if path.startswith("api/"):
+        abort(404)
 
+    fullpath = os.path.join(DIST_DIR, path)
+    if path and os.path.exists(fullpath) and os.path.isfile(fullpath):
+        # Sirve archivos reales de /dist (ej: /assets/...)
+        return send_from_directory(DIST_DIR, path)
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Fallback a index.html para rutas del router (login, pricing, servicios, etc.)
+    return send_from_directory(DIST_DIR, "index.html")
 
+# (Opcional) Si algún 404 se escapa y NO es API ni archivo con extensión, devolver index.html
+@app.errorhandler(404)
+def not_found(e):
+    # Si es API o parece archivo (tiene extensión), deja el 404
+    last = request.path.rsplit("/", 1)[-1]
+    if request.path.startswith("/api") or "." in last:
+        return e
+    return send_from_directory(DIST_DIR, "index.html")
+
+if __name__ == "__main__":
+    app.run(debug=False, host="0.0.0.0", port=5000)
