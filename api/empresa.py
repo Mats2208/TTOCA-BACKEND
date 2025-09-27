@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from auth_utils import get_user_projects, add_user_project, get_user_project_by_id, load_users, save_users
+from db_auth_utils import get_user_projects, add_user_project, get_user_project_by_id, update_user_project, delete_user_project
 
 
 empresa_bp = Blueprint('empresa', __name__)
@@ -29,15 +29,14 @@ def obtener_empresa_por_id(correo, proyecto_id):
 @empresa_bp.route('/usuarios/<correo>/proyectos/<proyecto_id>', methods=['PUT'])
 def actualizar_empresa(correo, proyecto_id):
     data = request.get_json()
-    users = load_users()
-    if correo not in users:
-        return jsonify({"message": "Usuario no encontrado"}), 404
+    exito, resultado = update_user_project(correo, proyecto_id, data)
+    if not exito:
+        return jsonify({"message": resultado}), 404
+    return jsonify({"message": "Actualizado correctamente"})
 
-    empresas = users[correo].get("empresas", [])
-    for i, empresa in enumerate(empresas):
-        if empresa["id"] == proyecto_id:
-            empresa.update(data)
-            save_users(users)
-            return jsonify({"message": "Actualizado correctamente", "empresa": empresa})
-
-    return jsonify({"message": "Proyecto no encontrado"}), 404
+@empresa_bp.route('/usuarios/<correo>/proyectos/<proyecto_id>', methods=['DELETE'])
+def eliminar_empresa(correo, proyecto_id):
+    exito, resultado = delete_user_project(correo, proyecto_id)
+    if not exito:
+        return jsonify({"message": resultado}), 404
+    return jsonify({"message": resultado})

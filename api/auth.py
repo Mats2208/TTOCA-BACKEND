@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from auth_utils import add_user, validate_user
+from db_auth_utils import add_user, validate_user
 
 auth_bp = Blueprint('auth', __name__)
 
