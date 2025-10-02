@@ -85,7 +85,7 @@ def agregar_turno(empresa_id, categoria_id, turno_obj):
                 next_position
             ))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return turno_obj
             
     except Exception as e:
@@ -127,10 +127,14 @@ def siguiente_turno(empresa_id, categoria_id):
                 WHERE categoria_id = ? AND empresa_id = ? AND estado = 'en_espera' AND posicion > ?
             ''', (categoria_id, empresa_id, turno['posicion']))
             
-            # Guardar como turno actual
-            guardar_turno_actual(empresa_id, categoria_id, turno['id'], turno)
+            # Guardar como turno actual dentro de la misma transacción
+            cursor.execute('''
+                INSERT OR REPLACE INTO turnos_actuales 
+                (empresa_id, categoria_id, turno_id, turno_data)
+                VALUES (?, ?, ?, ?)
+            ''', (empresa_id, categoria_id, turno['id'], json.dumps(turno)))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return turno
             
     except Exception as e:
@@ -172,8 +176,8 @@ def eliminar_cola(empresa_id, categoria_id):
                 WHERE id = ? AND empresa_id = ?
             ''', (categoria_id, empresa_id))
             
+            # El commit se hace automáticamente al salir del context manager
             if cursor.rowcount > 0:
-                conn.commit()
                 return True
             
             return False
@@ -194,7 +198,7 @@ def guardar_turno_actual(empresa_id, categoria_id, turno_id, turno_data):
                 VALUES (?, ?, ?, ?)
             ''', (empresa_id, categoria_id, turno_id, json.dumps(turno_data)))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             
     except Exception as e:
         print(f"Error al guardar turno actual: {e}")
@@ -351,7 +355,7 @@ def limpiar_turnos_antiguos():
                 WHERE created_at < datetime('now', '-1 day')
             ''')
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return turnos_eliminados
             
     except Exception as e:

@@ -9,10 +9,16 @@ DATABASE_NAME = 'ttoca.db'
 @contextmanager
 def get_db_connection():
     """Context manager para manejar conexiones a la base de datos"""
-    conn = sqlite3.connect(DATABASE_NAME)
+    conn = sqlite3.connect(DATABASE_NAME, timeout=10.0)  # Aumentar timeout para evitar locks
     conn.row_factory = sqlite3.Row  # Permite acceso por nombre de columna
+    conn.execute('PRAGMA journal_mode=WAL')  # Write-Ahead Logging para mejor concurrencia
+    conn.execute('BEGIN')  # Iniciar transacción explícita
     try:
         yield conn
+        conn.commit()  # Commit automático al salir exitosamente
+    except Exception:
+        conn.rollback()  # Rollback en caso de error
+        raise
     finally:
         conn.close()
 
@@ -109,7 +115,7 @@ def init_database():
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_turnos_estado ON turnos (estado)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_turnos_posicion ON turnos (posicion)')
         
-        conn.commit()
+        # El commit se hace automáticamente al salir del context manager
         print("✅ Base de datos inicializada correctamente")
 
 def migrate_from_json():
@@ -222,7 +228,7 @@ def migrate_from_json():
                             i + 1  # Posición en la cola (1-indexed)
                         ))
         
-        conn.commit()
+        # El commit se hace automáticamente al salir del context manager
         print("✅ Migración completada exitosamente")
 
 def backup_json_files():

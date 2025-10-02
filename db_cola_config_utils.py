@@ -85,7 +85,7 @@ def guardar_configuracion_empresa(empresa_id, config):
                     WHERE id = ? AND empresa_id = ?
                 ''', (categoria_id, empresa_id))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return True, "Configuración guardada correctamente"
             
     except Exception as e:
@@ -121,7 +121,7 @@ def agregar_categoria(empresa_id, categoria_data):
                 0  # Contador inicial
             ))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             
             # Retornar la categoría creada
             nueva_categoria = {
@@ -168,7 +168,7 @@ def actualizar_categoria(empresa_id, categoria_id, categoria_data):
                 empresa_id
             ))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return True, "Categoría actualizada correctamente"
             
     except Exception as e:
@@ -196,7 +196,7 @@ def eliminar_categoria(empresa_id, categoria_id):
                 WHERE id = ? AND empresa_id = ?
             ''', (categoria_id, empresa_id))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return True, "Categoría eliminada correctamente"
             
     except Exception as e:
@@ -291,7 +291,7 @@ def resetear_contador_categoria(empresa_id, categoria_id):
                 WHERE id = ? AND empresa_id = ?
             ''', (categoria_id, empresa_id))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return True, "Contador reseteado correctamente"
             
     except Exception as e:

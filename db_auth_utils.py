@@ -24,7 +24,7 @@ def add_user(username, email, password):
                 VALUES (?, ?)
             ''', (email, hashed_password.decode('utf-8')))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return True
             
     except Exception as e:
@@ -149,7 +149,7 @@ def add_user_project(email, proyecto_data):
                 json.dumps(nueva_empresa["config"])
             ))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return True, nueva_empresa
             
     except Exception as e:
@@ -186,7 +186,7 @@ def update_user_project(email, proyecto_id, proyecto_data):
                 email
             ))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return True, "Empresa actualizada correctamente"
             
     except Exception as e:
@@ -207,7 +207,7 @@ def delete_user_project(email, proyecto_id):
             # Eliminar empresa (esto también eliminará automáticamente las categorías y turnos asociados)
             cursor.execute('DELETE FROM empresas WHERE id = ? AND user_email = ?', (proyecto_id, email))
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             return True, "Empresa eliminada correctamente"
             
     except Exception as e:

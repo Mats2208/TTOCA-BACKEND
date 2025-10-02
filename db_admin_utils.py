@@ -94,7 +94,7 @@ def limpiar_turnos_completados(dias_antiguedad=1):
             
             turnos_actuales_eliminados = cursor.rowcount
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             
             return {
                 "turnos_eliminados": turnos_eliminados,
@@ -263,7 +263,7 @@ def reparar_posiciones_cola():
                 
                 colas_reparadas += 1
             
-            conn.commit()
+            # El commit se hace automáticamente al salir del context manager
             
             return {
                 "colas_reparadas": colas_reparadas,
