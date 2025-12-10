@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from db_cola_utils import agregar_turno, siguiente_turno, obtener_turnos, eliminar_cola, obtener_turno_actual, obtener_posicion_turno, buscar_turno_global, obtener_estadisticas_cola
+from services.cola_service import agregar_turno, siguiente_turno, obtener_turnos, eliminar_cola, obtener_turno_actual, obtener_posicion_turno, buscar_turno_global, obtener_estadisticas_cola
 import uuid
 import json
 

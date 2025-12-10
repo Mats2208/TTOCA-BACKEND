@@ -5,7 +5,7 @@ Herramienta de administración de la base de datos TTOCA
 Este script proporciona comandos útiles para administrar la base de datos SQLite.
 
 Uso:
-    python admin.py <comando> [opciones]
+    python scripts/admin.py <comando> [opciones]
 
 Comandos disponibles:
     stats              - Muestra estadísticas generales del sistema
@@ -18,9 +18,14 @@ Comandos disponibles:
 """
 
 import sys
+import os
+
+# Agregar el directorio raíz al path para imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import json
 from datetime import datetime
-from db_admin_utils import (
+from services.admin_service import (
     obtener_estadisticas_generales,
     limpiar_turnos_completados,
     obtener_actividad_por_empresa,

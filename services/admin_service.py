@@ -5,7 +5,7 @@ Este módulo proporciona funciones útiles para administrar la base de datos,
 como limpiezas, estadísticas y mantenimiento.
 """
 
-from database import get_db_connection
+from core.database import get_db_connection
 import sqlite3
 from datetime import datetime, timedelta
 

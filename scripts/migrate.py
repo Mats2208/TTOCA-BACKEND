@@ -9,14 +9,19 @@ Este script migra todos los datos existentes de archivos JSON a una base de dato
 - Valida la migración comparando datos
 
 Uso:
-    python migrate.py
+    python scripts/migrate.py
 """
 
 import os
+import sys
+
+# Agregar el directorio raíz al path para imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import json
 import sqlite3
 from datetime import datetime
-from database import init_database, migrate_from_json, backup_json_files
+from core.database import init_database, migrate_from_json, backup_json_files
 
 def validar_migracion():
     """Valida que la migración se haya realizado correctamente"""

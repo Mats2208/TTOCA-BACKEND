@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from db_cola_config_utils import (
+from services.cola_config_service import (
     obtener_configuracion, 
     guardar_configuracion_empresa, 
     agregar_categoria,

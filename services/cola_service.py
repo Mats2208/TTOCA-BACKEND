@@ -2,7 +2,8 @@ import uuid
 import random
 import string
 import json
-from database import get_db_connection
+from core.database import get_db_connection
+from core.websocket import emit_turno_agregado, emit_turno_llamado, emit_queue_update, emit_cola_eliminada
 
 def generar_codigo_corto():
     """Genera un código corto alfanumérico para los turnos"""
@@ -86,8 +87,16 @@ def agregar_turno(empresa_id, categoria_id, turno_obj):
             ))
             
             # El commit se hace automáticamente al salir del context manager
+
+            # Emitir evento WebSocket de turno agregado
+            emit_turno_agregado(empresa_id, categoria_id, turno_obj)
+
+            # Obtener y emitir lista actualizada de turnos
+            turnos_actualizados = obtener_turnos(empresa_id, categoria_id)
+            emit_queue_update(empresa_id, categoria_id, turnos_actualizados)
+
             return turno_obj
-            
+
     except Exception as e:
         print(f"Error al agregar turno: {e}")
         return None
@@ -129,14 +138,22 @@ def siguiente_turno(empresa_id, categoria_id):
             
             # Guardar como turno actual dentro de la misma transacción
             cursor.execute('''
-                INSERT OR REPLACE INTO turnos_actuales 
+                INSERT OR REPLACE INTO turnos_actuales
                 (empresa_id, categoria_id, turno_id, turno_data)
                 VALUES (?, ?, ?, ?)
             ''', (empresa_id, categoria_id, turno['id'], json.dumps(turno)))
-            
+
             # El commit se hace automáticamente al salir del context manager
+
+            # Emitir evento WebSocket de turno llamado
+            emit_turno_llamado(empresa_id, categoria_id, turno)
+
+            # Obtener y emitir lista actualizada de turnos
+            turnos_actualizados = obtener_turnos(empresa_id, categoria_id)
+            emit_queue_update(empresa_id, categoria_id, turnos_actualizados)
+
             return turno
-            
+
     except Exception as e:
         print(f"Error al obtener siguiente turno: {e}")
         return None
@@ -172,16 +189,18 @@ def eliminar_cola(empresa_id, categoria_id):
             
             # Eliminar la categoría (esto también eliminará automáticamente todos los turnos asociados)
             cursor.execute('''
-                DELETE FROM cola_categorias 
+                DELETE FROM cola_categorias
                 WHERE id = ? AND empresa_id = ?
             ''', (categoria_id, empresa_id))
-            
+
             # El commit se hace automáticamente al salir del context manager
             if cursor.rowcount > 0:
+                # Emitir evento WebSocket de cola eliminada
+                emit_cola_eliminada(empresa_id, categoria_id)
                 return True
-            
+
             return False
-            
+
     except Exception as e:
         print(f"Error al eliminar cola: {e}")
         return False

@@ -1,7 +1,7 @@
 import bcrypt
 import uuid
 import json
-from database import get_db_connection
+from core.database import get_db_connection
 from datetime import datetime
 
 def add_user(username, email, password):

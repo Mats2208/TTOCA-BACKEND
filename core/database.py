@@ -116,11 +116,11 @@ def init_database():
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_turnos_posicion ON turnos (posicion)')
         
         # El commit se hace automáticamente al salir del context manager
-        print("✅ Base de datos inicializada correctamente")
+        print("[OK] Base de datos inicializada correctamente")
 
 def migrate_from_json():
     """Migra datos existentes de archivos JSON a SQLite"""
-    print("🔄 Iniciando migración de datos JSON a SQLite...")
+    print("[MIGRACION] Iniciando migración de datos JSON a SQLite...")
     
     with get_db_connection() as conn:
         cursor = conn.cursor()
@@ -131,12 +131,12 @@ def migrate_from_json():
         config_file = 'cola_config.json'
         
         # Si los archivos están en backup, usar esos
-        if os.path.exists('json_backup/users.json.backup'):
-            users_file = 'json_backup/users.json.backup'
-        if os.path.exists('json_backup/Queue.json.backup'):
-            queue_file = 'json_backup/Queue.json.backup'
-        if os.path.exists('json_backup/cola_config.json.backup'):
-            config_file = 'json_backup/cola_config.json.backup'
+        if os.path.exists('backups/users.json.backup'):
+            users_file = 'backups/users.json.backup'
+        if os.path.exists('backups/Queue.json.backup'):
+            queue_file = 'backups/Queue.json.backup'
+        if os.path.exists('backups/cola_config.json.backup'):
+            config_file = 'backups/cola_config.json.backup'
         
         # Migrar usuarios y empresas desde users.json
         if os.path.exists(users_file):
@@ -229,11 +229,11 @@ def migrate_from_json():
                         ))
         
         # El commit se hace automáticamente al salir del context manager
-        print("✅ Migración completada exitosamente")
+        print("[OK] Migración completada exitosamente")
 
 def backup_json_files():
     """Crea backup de los archivos JSON antes de la migración"""
-    backup_dir = 'json_backup'
+    backup_dir = 'backups'
     if not os.path.exists(backup_dir):
         os.makedirs(backup_dir)
     
@@ -251,5 +251,5 @@ if __name__ == "__main__":
     # Migrar datos existentes
     migrate_from_json()
     
-    print("\n🎉 Configuración de base de datos completada!")
+    print("\n[COMPLETADO] Configuración de base de datos completada!")
     print("La base de datos SQLite está lista para usar.")

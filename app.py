@@ -4,7 +4,8 @@ from api.auth import auth_bp
 from api.empresa import empresa_bp
 from api.cola import cola_bp
 from api.cola_config import cola_config_bp
-from database import init_database
+from core.database import init_database
+from core.websocket import init_socketio
 import os
 import atexit
 
@@ -29,6 +30,9 @@ CORS(
 # Inicializa DB
 init_database()
 
+# Inicializa WebSocket
+socketio = init_socketio(app)
+
 # Blueprints API
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(empresa_bp, url_prefix='/api')
@@ -38,10 +42,10 @@ app.register_blueprint(cola_config_bp, url_prefix='/api')
 # Limpieza al salir
 def cleanup_old_records():
     try:
-        from db_cola_utils import limpiar_turnos_antiguos
+        from services.cola_service import limpiar_turnos_antiguos
         n = limpiar_turnos_antiguos()
         if n > 0:
-            print(f"🧹 Limpieza automática: {n} turnos antiguos eliminados")
+            print(f"[LIMPIEZA] Limpieza automática: {n} turnos antiguos eliminados")
     except Exception as e:
         print(f"Error en limpieza automática: {e}")
 
@@ -73,4 +77,5 @@ def not_found(e):
     return send_from_directory(DIST_DIR, "index.html")
 
 if __name__ == "__main__":
-    app.run(debug=False, host="0.0.0.0", port=8001)
+    # Usar socketio.run() en lugar de app.run() para soporte de WebSocket
+    socketio.run(app, debug=False, host="0.0.0.0", port=8001)

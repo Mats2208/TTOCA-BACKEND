@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from db_auth_utils import get_user_projects, add_user_project, get_user_project_by_id, update_user_project, delete_user_project
+from services.auth_service import get_user_projects, add_user_project, get_user_project_by_id, update_user_project, delete_user_project
 
 
 empresa_bp = Blueprint('empresa', __name__)

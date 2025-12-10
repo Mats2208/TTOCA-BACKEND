@@ -5,7 +5,7 @@ Script de despliegue para TTOCA Backend en producción
 Este script automatiza las tareas comunes de despliegue y mantenimiento.
 
 Uso:
-    python deploy.py <comando>
+    python scripts/deploy.py <comando>
 
 Comandos:
     setup      - Configuración inicial en servidor
@@ -18,6 +18,10 @@ Comandos:
 
 import os
 import sys
+
+# Agregar el directorio raíz al path para imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import subprocess
 import sqlite3
 from datetime import datetime

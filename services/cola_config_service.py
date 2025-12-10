@@ -1,6 +1,6 @@
 import uuid
 import json
-from database import get_db_connection
+from core.database import get_db_connection
 
 def obtener_configuracion(empresa_id):
     """Obtiene la configuración completa de las colas de una empresa"""

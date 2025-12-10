@@ -5,10 +5,12 @@ Script de prueba para verificar las correcciones de concurrencia en la base de d
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from database import get_db_connection
-from db_cola_utils import agregar_turno, siguiente_turno, obtener_turnos, obtener_turno_actual
+# Agregar el directorio raíz al path para imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from core.database import get_db_connection
+from services.cola_service import agregar_turno, siguiente_turno, obtener_turnos, obtener_turno_actual
 import json
 
 def test_database_fixes():
