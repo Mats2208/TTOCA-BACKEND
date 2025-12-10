@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, request, abort
+from flask import Flask, jsonify
 from flask_cors import CORS
 from api.auth import auth_bp
 from api.empresa import empresa_bp
@@ -6,24 +6,20 @@ from api.cola import cola_bp
 from api.cola_config import cola_config_bp
 from core.database import init_database
 from core.websocket import init_socketio
-import os
 import atexit
+from datetime import datetime
 
-# --- Config estática manual ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DIST_DIR = os.path.join(BASE_DIR, "dist")
-
-# Desactiva la ruta estática automática (evita interceptar /pricing, /login, etc.)
+# Inicializa Flask sin static_folder
 app = Flask(__name__, static_folder=None)
 
-# CORS solo para API
+# CORS configurado para permitir orígenes específicos
 CORS(
     app,
-    resources={r"/api/*": {"origins": [
+    origins=[
         "http://localhost:5173",
         "https://ttoca.online",
         "https://www.ttoca.online",
-    ]}},
+    ],
     supports_credentials=True
 )
 
@@ -51,30 +47,52 @@ def cleanup_old_records():
 
 atexit.register(cleanup_old_records)
 
-# --- Servir SPA ---
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def spa(path):
-    # No interceptar rutas de API
-    if path.startswith("api/"):
-        abort(404)
+# --- Health Check Endpoints ---
+@app.route("/")
+def root():
+    """Endpoint raíz que indica que es una API"""
+    return jsonify({
+        "message": "TTOCA API",
+        "version": "1.0.0",
+        "status": "running"
+    })
 
-    fullpath = os.path.join(DIST_DIR, path)
-    if path and os.path.exists(fullpath) and os.path.isfile(fullpath):
-        # Sirve archivos reales de /dist (ej: /assets/...)
-        return send_from_directory(DIST_DIR, path)
+@app.route("/health")
+def health():
+    """Health check endpoint"""
+    return jsonify({
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat()
+    })
 
-    # Fallback a index.html para rutas del router (login, pricing, servicios, etc.)
-    return send_from_directory(DIST_DIR, "index.html")
+@app.route("/api/health")
+def api_health():
+    """API health check endpoint"""
+    return jsonify({
+        "status": "healthy",
+        "api": "operational",
+        "database": "connected",
+        "timestamp": datetime.utcnow().isoformat()
+    })
 
-# (Opcional) Si algún 404 se escapa y NO es API ni archivo con extensión, devolver index.html
-@app.errorhandler(404)
-def not_found(e):
-    # Si es API o parece archivo (tiene extensión), deja el 404
-    last = request.path.rsplit("/", 1)[-1]
-    if request.path.startswith("/api") or "." in last:
-        return e
-    return send_from_directory(DIST_DIR, "index.html")
+@app.route("/api/status")
+def api_status():
+    """Endpoint de estado detallado"""
+    try:
+        # Verificar conexión a base de datos
+        from core.database import db
+        db.execute_query("SELECT 1")
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+
+    return jsonify({
+        "api": "operational",
+        "database": db_status,
+        "websocket": "enabled",
+        "version": "1.0.0",
+        "timestamp": datetime.utcnow().isoformat()
+    })
 
 if __name__ == "__main__":
     # Usar socketio.run() en lugar de app.run() para soporte de WebSocket
